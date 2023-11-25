@@ -14,6 +14,7 @@
     "nodemon": "^3.0.1"
   },
   "dependencies": {
+    "@notionhq/client": "^2.2.13",
     "grammy": "^1.19.2"
   }
 }
