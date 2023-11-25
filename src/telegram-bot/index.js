@@ -1,15 +1,30 @@
 import { Bot } from "grammy";
-import { parseMessageToNotionDatabaseData } from "./utils.js";
+import { parseMessageToNewEntry } from "./utils.js";
+import { findDatabase, createNotionDatabaseEntry } from "../notion/utils.js";
 
 const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
-bot.command("add", (ctx) => {
-  const messageContent = ctx.message?.text.replace("/add ", "") ?? "";
-  const notionDatabaseData = parseMessageToNotionDatabaseData(messageContent);
+bot.command("add", async (ctx) => {
+  const notionDatabase = await findDatabase(process.env.NOTION_DATABASE_ID);
 
-  if (!notionDatabaseData) {
-    ("Invalid message format. It should be: event, date, severity, lead");
+  if (!notionDatabase) {
+    return ctx.reply("Database not found");
   }
+
+  const messageContent = ctx.message?.text.replace("/add ", "") ?? "";
+  const parsedMessage = parseMessageToNewEntry(messageContent);
+
+  if (!parsedMessage) {
+    return ctx.reply(
+      "Invalid message format. It should be: event, date, severity, lead"
+    );
+  }
+
+  const databaseProperties = notionDatabase.properties;
+  const newNotionDatabaseEntry = createNotionDatabaseEntry(
+    parsedMessage,
+    databaseProperties
+  );
 });
 
 bot.start();
