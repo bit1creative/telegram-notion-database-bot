@@ -1,17 +1,17 @@
 export const parseMessageToNewEntry = (message) => {
   const messageSplit = message.split(",");
 
-  // we expect the message to be in the format of: event, date, severity, lead
+  // we expect the message to be in the format of: event, date, effort, lead
   if (messageSplit.length !== 4) {
     return null;
   }
 
-  const [event, date, severity, lead] = messageSplit;
+  const [event, date, effort, lead] = messageSplit;
 
   return {
     event,
     date,
-    severity,
+    effort,
     lead,
   };
 };

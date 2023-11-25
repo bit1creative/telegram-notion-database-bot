@@ -1,11 +1,22 @@
 import { Bot } from "grammy";
 import { parseMessageToNewEntry } from "./utils.js";
-import { findDatabase, createNotionDatabaseEntry } from "../notion/utils.js";
+import {
+  findDatabase,
+  createNotionDatabaseEntry,
+  addPageToDatabase,
+} from "../notion/utils.js";
 
 const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
+bot.command("start", (ctx) =>
+  ctx.reply(
+    "Welcome! \nUse /add to add a new entry \nUse the following format: `/add event, focus date iso string, effort, lead name`"
+  )
+);
+
 bot.command("add", async (ctx) => {
-  const notionDatabase = await findDatabase(process.env.NOTION_DATABASE_ID);
+  const databaseId = process.env.NOTION_DATABASE_ID;
+  const notionDatabase = await findDatabase(databaseId);
 
   if (!notionDatabase) {
     return ctx.reply("Database not found");
@@ -21,10 +32,32 @@ bot.command("add", async (ctx) => {
   }
 
   const databaseProperties = notionDatabase.properties;
-  const newNotionDatabaseEntry = createNotionDatabaseEntry(
+  const newNotionDatabaseEntry = await createNotionDatabaseEntry(
     parsedMessage,
     databaseProperties
   );
+
+  try {
+    await addPageToDatabase(databaseId, newNotionDatabaseEntry);
+  } catch (error) {
+    console.log(error);
+  }
+
+  ctx.reply("Entry added!");
+});
+
+bot.catch((err) => {
+  console.log("Ooops", err);
+  setTimeout(function () {
+    process.on("exit", function () {
+      require("child_process").spawn(process.argv.shift(), process.argv, {
+        cwd: process.cwd(),
+        detached: true,
+        stdio: "inherit",
+      });
+    });
+    process.exit();
+  }, 5000);
 });
 
 bot.start();

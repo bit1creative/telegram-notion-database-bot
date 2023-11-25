@@ -1,3 +1,4 @@
+import Fuse from "fuse.js";
 import { notionClient } from "./index.js";
 
 export const findDatabase = async (databaseId) => {
@@ -11,8 +12,20 @@ export const findDatabase = async (databaseId) => {
   return databases.results.find(({ id }) => id === databaseId);
 };
 
-export const createNotionDatabaseEntry = (message, databaseProperties) => {
-  const { event, date, severity, lead } = message;
+export const createNotionDatabaseEntry = async (
+  message,
+  databaseProperties
+) => {
+  const { event, date, effort, lead } = message;
+
+  const effortFuse = new Fuse(databaseProperties.Effort.select.options, {
+    keys: ["name"],
+    threshold: 0.8,
+  });
+
+  const parsedEffort = effortFuse.search(effort)[0].item.name;
+  const parsedDate = new Date(date).toISOString();
+  const parsedLead = await findUser(lead);
 
   const pageOptions = {
     properties: {
@@ -21,21 +34,29 @@ export const createNotionDatabaseEntry = (message, databaseProperties) => {
         title: [{ type: "text", text: { content: event } }],
       },
       Status: {
-        date: {
-          start: date,
+        type: "select",
+        select: {
+          name: "not-started",
         },
       },
-      Severity: {
+      Focus: {
+        type: "date",
+        date: {
+          start: parsedDate,
+        },
+      },
+      Effort: {
+        type: "select",
         select: {
-          name: severity,
+          name: parsedEffort,
         },
       },
       Lead: {
-        rich_text: [
+        type: "people",
+        people: [
           {
-            text: {
-              content: lead,
-            },
+            object: "user",
+            id: parsedLead.id,
           },
         ],
       },
@@ -43,6 +64,18 @@ export const createNotionDatabaseEntry = (message, databaseProperties) => {
   };
 
   return pageOptions;
+};
+
+export const findUser = async (userName) => {
+  const userList = await notionClient.users.list();
+  const userFuse = new Fuse(userList.results, {
+    keys: ["name"],
+    threshold: 0.8,
+  });
+
+  const user = userFuse.search(userName)[0].item;
+
+  return user;
 };
 
 export const addPageToDatabase = async (databaseId, pageOptions) => {
