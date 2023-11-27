@@ -5,9 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --env-file=.env index.js",
-    "run": "node --env-file=.env index.js",
+    "start:dev": "nodemon --env-file=.env index.js",
+    "start:prod": "node --env-file=.env index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines" : { 
+    "node" : "20.x" 
   },
   "author": "Ivan Hrytsenko | @bit1creative",
   "license": "ISC",
