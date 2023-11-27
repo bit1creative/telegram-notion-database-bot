@@ -8,45 +8,54 @@ import {
 import { spawn } from "child_process";
 import { argv } from "process";
 import { cwd } from "process";
+import {
+  helpHandler,
+  startHandler,
+  addNewEntryHelperText,
+} from "./commands/index.js";
 
-const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
+export const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
-bot.command("start", (ctx) =>
-  ctx.reply(
-    "Welcome! \nUse /add to add a new entry \nUse the following format:\n```/add event, focus date iso string, effort, lead name```"
-  )
-);
+bot.command("start", startHandler);
+bot.command("help", helpHandler);
+
+bot.on("message", (ctx) => {
+  if (ctx.message.text === "How to add an entry?") {
+    // You can call your help command here
+    ctx.reply(addNewEntryHelperText, { parse_mode: "MarkdownV2" });
+  }
+});
 
 bot.command("add", async (ctx) => {
-  const databaseId = process.env.NOTION_DATABASE_ID;
-  const notionDatabase = await findDatabase(databaseId);
-
-  if (!notionDatabase) {
-    return ctx.reply("Database not found");
-  }
-
-  const messageContent = ctx.message?.text.replace("/add ", "") ?? "";
-  const parsedMessage = parseMessageToNewEntry(messageContent);
-
-  if (!parsedMessage) {
-    return ctx.reply(
-      "Invalid message format. It should be: event, date, severity, lead"
-    );
-  }
-
-  const databaseProperties = notionDatabase.properties;
-  const newNotionDatabaseEntry = await createNotionDatabaseEntry(
-    parsedMessage,
-    databaseProperties
-  );
-
   try {
-    await addPageToDatabase(databaseId, newNotionDatabaseEntry);
-  } catch (error) {
-    console.log(error);
-  }
+    const databaseId = process.env.NOTION_DATABASE_ID;
+    const notionDatabase = await findDatabase(databaseId);
 
-  ctx.reply("Entry added!");
+    if (!notionDatabase) {
+      return ctx.reply("Database not found");
+    }
+
+    const messageContent = ctx.message?.text.replace("/add ", "") ?? "";
+    const parsedMessage = parseMessageToNewEntry(messageContent);
+
+    if (!parsedMessage) {
+      return ctx.reply(
+        "Invalid message format. It should be: event, date, severity, lead"
+      );
+    }
+
+    const databaseProperties = notionDatabase.properties;
+    const newNotionDatabaseEntry = await createNotionDatabaseEntry(
+      parsedMessage,
+      databaseProperties
+    );
+
+    await addPageToDatabase(databaseId, newNotionDatabaseEntry);
+
+    ctx.reply("Entry added!");
+  } catch (e) {
+    ctx.reply(`Error adding entry. \nError: ${e.message}`);
+  }
 });
 
 bot.catch((err) => {

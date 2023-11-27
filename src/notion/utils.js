@@ -24,7 +24,7 @@ export const createNotionDatabaseEntry = async (
   });
 
   const parsedEffort = effortFuse.search(effort)[0].item.name;
-  const parsedDate = new Date(date).toISOString();
+  const parsedDate = new Date(date.trim()).toISOString();
   const parsedLead = await findUser(lead);
 
   const pageOptions = {
