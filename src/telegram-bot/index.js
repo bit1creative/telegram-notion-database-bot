@@ -9,7 +9,7 @@ import {
   addNewEntryHelperText,
   addHandler,
 } from "./commands/index.js";
-import { getDatabases } from "../notion/utils.js";
+import { getDatabases, findUserById } from "../notion/utils.js";
 
 export const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
@@ -21,6 +21,13 @@ bot.command("secretDatabaseLookup", async (ctx) => {
 
   ctx.reply(JSON.stringify(databases));
 });
+bot.command("secretUserLookup", async (ctx) => {
+  const userId = ctx.message?.text.replace("/secretUserLookup ", "") ?? "";
+
+  const user = await findUserById(userId);
+
+  ctx.reply(JSON.stringify(user));
+});
 
 bot.on("message", (ctx) => {
   console.log(`Handling message: ${ctx.message.text}`);
@@ -30,14 +37,7 @@ bot.on("message", (ctx) => {
   }
 });
 
-bot.command("getDatabases", async (ctx) => {
-  const databases = await getDatabases();
-
-  ctx.reply(`DATABASES: ${databases}`);
-});
-
-bot.catch((err) => {
-  console.log("Ooops", err);
+bot.catch(async (err) => {
   setTimeout(function () {
     process.on("exit", function () {
       spawn(argv.shift(), argv, {

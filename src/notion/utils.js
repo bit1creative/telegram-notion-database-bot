@@ -1,4 +1,5 @@
 import Fuse from "fuse.js";
+// import { DateTime } from "luxon";
 import { notionClient } from "./index.js";
 
 export const findDatabase = async (databaseId) => {
@@ -16,15 +17,16 @@ export const createNotionDatabaseEntry = async (
   message,
   databaseProperties
 ) => {
-  const { event, date, effort, lead } = message;
+  // const { event, date, effort, lead } = message;
+  const { event, lead } = message;
 
-  const effortFuse = new Fuse(databaseProperties.Effort.select.options, {
-    keys: ["name"],
-    threshold: 0.8,
-  });
+  // const effortFuse = new Fuse(databaseProperties.Effort.select.options, {
+  //   keys: ["name"],
+  //   threshold: 0.8,
+  // });
 
-  const parsedEffort = effortFuse.search(effort)[0].item.name;
-  const parsedDate = new Date(date.trim()).toISOString();
+  // const parsedEffort = effortFuse.search(effort)[0].item.name;
+  // const parsedDate = DateTime.fromFormat(date.trim(), "dd/MM/yyyy").toISO();
   const parsedLead = await findUser(lead);
 
   const pageOptions = {
@@ -33,24 +35,24 @@ export const createNotionDatabaseEntry = async (
         type: "title",
         title: [{ type: "text", text: { content: event } }],
       },
-      Status: {
-        type: "select",
-        select: {
-          name: "not-started",
-        },
-      },
-      'Focus Date': {
-        type: "date",
-        date: {
-          start: parsedDate,
-        },
-      },
-      Effort: {
-        type: "select",
-        select: {
-          name: parsedEffort,
-        },
-      },
+      // Status: {
+      //   type: "select",
+      //   select: {
+      //     name: "not-started",
+      //   },
+      // },
+      // "Focus Date": {
+      //   type: "date",
+      //   date: {
+      //     start: parsedDate,
+      //   },
+      // },
+      // Effort: {
+      //   type: "select",
+      //   select: {
+      //     name: parsedEffort,
+      //   },
+      // },
       Lead: {
         type: "people",
         people: [
@@ -67,15 +69,19 @@ export const createNotionDatabaseEntry = async (
 };
 
 export const findUser = async (userName) => {
-  const userList = await notionClient.users.list();
-  const userFuse = new Fuse(userList.results, {
+  const userList = (await notionClient.users.list()).results.filter(
+    ({ type }) => type !== "bot"
+  );
+  const userFuse = new Fuse(userList, {
     keys: ["name"],
     threshold: 0.8,
   });
-
-  const user = userFuse.search(userName)[0].item;
-
-  return user;
+  try {
+    const user = userFuse.search(userName)[0].item;
+    return user;
+  } catch (e) {
+    new Error(`User ${userName} not found`);
+  }
 };
 
 export const addPageToDatabase = async (databaseId, pageOptions) => {
@@ -99,4 +105,10 @@ export const getDatabases = async () => {
   });
 
   return databases;
+};
+
+export const findUserById = async (userId) => {
+  const user = await notionClient.users.retrieve({ user_id: userId });
+
+  return user;
 };

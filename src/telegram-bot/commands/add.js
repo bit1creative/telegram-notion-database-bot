@@ -20,7 +20,7 @@ export const addHandler = async (ctx) => {
 
     if (!parsedMessage) {
       return ctx.reply(
-        "Invalid message format. It should be: event, date, severity, lead"
+        "Invalid message format. It should be: event. lead"
       );
     }
 
