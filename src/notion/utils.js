@@ -88,3 +88,14 @@ export const addPageToDatabase = async (databaseId, pageOptions) => {
 
   return response;
 };
+
+export const getDatabases = async () => {
+  const databases = await notion.search({
+    filter: {
+      property: "object",
+      value: "database",
+    },
+  });
+
+  return JSON.stringify(databases);
+};

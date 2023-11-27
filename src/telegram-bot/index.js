@@ -9,6 +9,7 @@ import {
   addNewEntryHelperText,
   addHandler,
 } from "./commands/index.js";
+import { getDatabases } from "../notion/utils.js";
 
 export const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 
@@ -22,6 +23,12 @@ bot.on("message", (ctx) => {
     // You can call your help command here
     ctx.reply(addNewEntryHelperText, { parse_mode: "MarkdownV2" });
   }
+});
+
+bot.command("get-databases", async (ctx) => {
+  const databases = await getDatabases();
+
+  ctx.reply(`DATABASES: ${databases}`);
 });
 
 bot.catch((err) => {
