@@ -25,7 +25,7 @@ bot.on("message", (ctx) => {
   }
 });
 
-bot.command("get-databases", async (ctx) => {
+bot.command("getDatabases", async (ctx) => {
   const databases = await getDatabases();
 
   ctx.reply(`DATABASES: ${databases}`);
