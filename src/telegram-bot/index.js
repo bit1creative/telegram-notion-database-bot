@@ -16,6 +16,11 @@ export const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN);
 bot.command("start", startHandler);
 bot.command("help", helpHandler);
 bot.command("add", addHandler);
+bot.command("secretDatabaseLookup", async (ctx) => {
+  const databases = await getDatabases();
+
+  ctx.reply(JSON.stringify(databases));
+});
 
 bot.on("message", (ctx) => {
   console.log(`Handling message: ${ctx.message.text}`);

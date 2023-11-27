@@ -39,7 +39,7 @@ export const createNotionDatabaseEntry = async (
           name: "not-started",
         },
       },
-      Focus: {
+      'Focus Date': {
         type: "date",
         date: {
           start: parsedDate,
@@ -90,12 +90,13 @@ export const addPageToDatabase = async (databaseId, pageOptions) => {
 };
 
 export const getDatabases = async () => {
-  const databases = await notion.search({
+  // starting to search for databases
+  const databases = await notionClient.search({
     filter: {
       property: "object",
       value: "database",
     },
   });
 
-  return JSON.stringify(databases);
+  return databases;
 };
