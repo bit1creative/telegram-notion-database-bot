@@ -7,11 +7,11 @@ export const helpHandler = (ctx) =>
   );
 
 export const addNewEntryHelperText = `You can use the following command to add a new entry to the database:
-                                    \n\`/add [event]. [lead]\`
+                                    \n\`/add [event] @[lead]\`
                                     \n Where:
                                     \n*\`event\`* is the name of the event,
-                                    \n*\`lead\`* is the lead of the event, type the name of the lead as he named in the Notion workspace
-                                    \n Example: \`/add New Drop. Severyn\`
+                                    \n*\`@lead\`* is the lead of the event, type the name of the lead as he named in the Notion workspace
+                                    \n Example: \`/add New Drop @Severyn\`
                                     `;
 // export const addNewEntryHelperText = `You can use the following command to add a new entry to the database:
 //                                     \n\`/add [event]| [date]| [severity]| [lead]\`

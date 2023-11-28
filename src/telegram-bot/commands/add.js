@@ -15,22 +15,25 @@ export const addHandler = async (ctx) => {
       return ctx.reply("Database not found");
     }
 
-    const messageContent = ctx.message?.text.replace("/add ", "") ?? "";
-    const parsedMessage = parseMessageToNewEntry(messageContent);
+    const messageContent = ctx.message?.text.replaceAll("/add ", "") ?? "";
+    const messageEntries = messageContent.split("\n");
+    messageEntries.forEach(async (entry) => {
+      const parsedMessage = parseMessageToNewEntry(entry);
 
-    if (!parsedMessage) {
-      return ctx.reply("Invalid message format. It should be: event. lead");
-    }
+      if (!parsedMessage) {
+        return ctx.reply("Invalid message format. It should be: event. lead");
+      }
 
-    const databaseProperties = notionDatabase.properties;
-    const newNotionDatabaseEntry = await createNotionDatabaseEntry(
-      parsedMessage,
-      databaseProperties
-    );
+      const databaseProperties = notionDatabase.properties;
+      const newNotionDatabaseEntry = await createNotionDatabaseEntry(
+        parsedMessage,
+        databaseProperties
+      );
 
-    await addPageToDatabase(databaseId, newNotionDatabaseEntry);
+      await addPageToDatabase(databaseId, newNotionDatabaseEntry);
+    });
 
-    ctx.reply("Entry added!");
+    ctx.reply(`${messageEntries.length} entries added!`);
   } catch (e) {
     ctx.reply(`Error adding entry. \nError: ${e.message}`);
   }
