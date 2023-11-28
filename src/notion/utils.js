@@ -38,8 +38,14 @@ export const createNotionDatabaseEntry = async (
         title: [{ type: "text", text: { content: event } }],
       },
       "Person bot": {
-        type: "text",
-        text: [{ type: "text", text: { content: localUser } }],
+        rich_text: [
+          {
+            type: "text",
+            text: {
+              content: localUser,
+            },
+          },
+        ],
       },
       Status: {
         type: "select",

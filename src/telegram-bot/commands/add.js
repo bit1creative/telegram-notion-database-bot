@@ -19,9 +19,7 @@ export const addHandler = async (ctx) => {
     const parsedMessage = parseMessageToNewEntry(messageContent);
 
     if (!parsedMessage) {
-      return ctx.reply(
-        "Invalid message format. It should be: event. lead"
-      );
+      return ctx.reply("Invalid message format. It should be: event. lead");
     }
 
     const databaseProperties = notionDatabase.properties;
