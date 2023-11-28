@@ -7,7 +7,6 @@ import {
 
 export const addHandler = async (ctx) => {
   try {
-    ctx.reply("Trying to add a new entry");
     const databaseId = process.env.NOTION_DATABASE_ID;
     const notionDatabase = await findDatabase(databaseId);
 
