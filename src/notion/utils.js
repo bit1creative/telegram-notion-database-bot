@@ -41,12 +41,12 @@ export const createNotionDatabaseEntry = async (
         type: "text",
         text: [{ type: "text", text: { content: localUser } }],
       },
-      // Status: {
-      //   type: "select",
-      //   select: {
-      //     name: "not-started",
-      //   },
-      // },
+      Status: {
+        type: "select",
+        select: {
+          name: "not-started",
+        },
+      },
       // "Focus Date": {
       //   type: "date",
       //   date: {
