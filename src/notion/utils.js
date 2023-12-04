@@ -37,7 +37,7 @@ export const createNotionDatabaseEntry = async (
         type: "title",
         title: [{ type: "text", text: { content: event } }],
       },
-      "Person bot": {
+      "Bot tag": {
         rich_text: [
           {
             type: "text",

@@ -29,7 +29,18 @@ export const addHandler = async (ctx) => {
         databaseProperties
       );
 
-      await addPageToDatabase(databaseId, newNotionDatabaseEntry);
+      const response = await addPageToDatabase(
+        databaseId,
+        newNotionDatabaseEntry
+      );
+
+      if (response?.code) {
+        return ctx.reply(
+          `Error adding entry. \nError: ${response.code} ${response.message}`
+        );
+      }
+
+      ctx.reply(`Entry added! $${JSON.stringify(response)}`);
     });
 
     ctx.reply(`${messageEntries.length} entries added!`);
